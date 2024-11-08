@@ -125,6 +125,7 @@ class UserInterface:
         print()
         print_error("Unable to add. An item with that id already exists.")
 
+
     # endregion public methods
 
     # region private methods
@@ -140,7 +141,7 @@ class UserInterface:
         print()
         print("1. Load Beverage List From CSV")
         print("2. Print Entire List Of Items")
-        print("3. Search For An Item")
+        print("3. Search For An Item (by ID)")
         print("4. Add New Item To The List")
         print("5. Exit Program")
 
@@ -235,6 +236,7 @@ class UserInterface:
         print(f"Should the Item be {fieldname}? (y/n)")
         self.__display_prompt()
         valid = False
+        value = ""
         while not valid:
             user_input = input()
             if user_input.lower() == "y" or user_input.lower() == "n":

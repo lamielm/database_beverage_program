@@ -1,10 +1,30 @@
 """Program code"""
 
 # Internal imports.
-from beverage import BeverageCollection
+from beverage import Beverage, BeverageCollection, Base
 from errors import AlreadyImportedError
 from user_interface import UserInterface
 from utils import CSVProcessor
+import os
+
+# Third-Pary imports
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+
+engine = create_engine("sqlite:///db.sqlite3", echo=False)
+Session = sessionmaker(bind=engine)
+session = Session()
+
+def create_database():
+    """Create the database tables based on the defined models"""
+    Base.metadata.create_all(engine)
+
+def populate_database(beverages):
+    """Populate database from list of beverages"""
+    for beverage in beverages:
+        session.add(beverage)
+        session.commit()
+    
 
 # Set a constant for the path to the CSV file
 PATH_TO_CSV = "./datafiles/beverage_list.csv"
@@ -32,17 +52,27 @@ def main(*args):
     # While the choice is not exit program
     while choice != 5:
         if choice == 1:
-            # Load the CSV File
-            try:
-                csv_processor.import_csv(beverage_collection, PATH_TO_CSV)
-                ui.display_import_success()
+            # Create the database if it doens't already exist
+            if not os.path.exists("./db.sqlite3"):
+                # Create the database
+                create_database()
+            
+            # Check to see if there are any records in the DB.  If not, upload Beverages and put them into the DB.
+            if session.query(Beverage).first() is None:
+                # Load the CSV File
+                try:
+                    csv_processor.import_csv(beverage_collection, PATH_TO_CSV)
+                    ui.display_import_success()
 
-            except AlreadyImportedError:
-                ui.display_already_imported_error()
-            except FileNotFoundError:
-                ui.display_file_not_found_error()
-            except EOFError:
-                ui.display_empty_file_error()
+                except AlreadyImportedError:
+                    ui.display_already_imported_error()
+                except FileNotFoundError:
+                    ui.display_file_not_found_error()
+                except EOFError:
+                    ui.display_empty_file_error()
+                
+                # Populate DB with data from CSV
+                populate_database(beverage_collection)
 
         elif choice == 2:
             # Print Entire List Of Items

@@ -3,9 +3,30 @@
 # System Imports.
 import os
 
+# First-Party imports
+from program import session
+from user_interface import UserInterface
 
-class Beverage:
+# Third-Party imports
+from sqlalchemy import Column
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.types import String, Float, Boolean
+
+# Base class for other models to inherit from
+Base = declarative_base()
+
+ui = UserInterface
+
+class Beverage(Base):
     """Beverage class"""
+
+    __tablename__ = "beverages"
+
+    id = Column(String(255), primary_key=True)
+    name = Column(String(255), nullable=False)
+    pack = Column(String(255), nullable=False)
+    price = Column(Float(2), nullable=False)
+    active = Column(Boolean, nullable=False)
 
     def __init__(self, id_, name, pack, price, active):
         """Constructor"""
@@ -34,13 +55,25 @@ class BeverageCollection:
         for beverage in self.__beverages:
             return_string += f"{beverage}{os.linesep}"
         return return_string
+    
 
     def add(self, id_, name, pack, price, active):
         """Add a new beverage to the collection"""
-        self.__beverages.append(Beverage(id_, name, pack, price, active))
+        new_beverage = Beverage(id_, name, pack, price, active)
+        session.add(new_beverage)
+        session.commit()
 
     def find_by_id(self, id_):
         """Find a beverage by it's id"""
-        for beverage in self.__beverages:
-            if beverage.id == id_:
-                return beverage
+        single_beverage_id = (
+            session.query(
+                Beverage, 
+            )
+            .filter(
+                Beverage.id == id_
+            )
+            .first()
+        )
+        return single_beverage_id
+            
+    # I have to edit add(Should be good?), change find to filter(might be good?  Haven't tested it), update, and delete CRUD
