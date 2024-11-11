@@ -11,7 +11,7 @@ class CSVProcessor:
         """Constructor"""
         self._has_been_imported = False
 
-    def import_csv(self, beverage_collection, path_to_csv_file):
+    def import_csv(self, beverage_collection, path_to_csv_file, session):
         """Import CSV and populate beverage collection"""
 
         # If already imported, raise AlreadyImportedError
@@ -30,6 +30,8 @@ class CSVProcessor:
                 line = file.readline().replace("\n", "")
             # All lines read and processed, flip flag to true.
             self._has_been_imported = True
+        # Removed the session.commit from the "add" method as it was slowing down my program.  It committed after every object.
+        session.commit()
 
     def _process_line(self, line, beverage_collection):
         """Process a line from a CSV file"""

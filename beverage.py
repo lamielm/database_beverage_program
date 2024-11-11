@@ -3,19 +3,20 @@
 # System Imports.
 import os
 
-# First-Party imports
-from program import session
-from user_interface import UserInterface
-
 # Third-Party imports
-from sqlalchemy import Column
+from sqlalchemy import Column, create_engine
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.types import String, Float, Boolean
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.types import (String, Float, Boolean)
+
+
+engine = create_engine("sqlite:///db.sqlite3", echo=False)
+Session = sessionmaker(bind=engine)
+session = Session()
 
 # Base class for other models to inherit from
 Base = declarative_base()
 
-ui = UserInterface
 
 class Beverage(Base):
     """Beverage class"""
@@ -25,7 +26,7 @@ class Beverage(Base):
     id = Column(String(255), primary_key=True)
     name = Column(String(255), nullable=False)
     pack = Column(String(255), nullable=False)
-    price = Column(Float(2), nullable=False)
+    price = Column(Float, nullable=False)
     active = Column(Boolean, nullable=False)
 
     def __init__(self, id_, name, pack, price, active):
@@ -42,26 +43,37 @@ class Beverage(Base):
         return f"| {self.id:>6} | {self.name:<56} | {self.pack:<15} | {self.price:>6.2f} | {active:<6} |"
 
 
-class BeverageCollection:
-    """BeverageCollection class"""
+class BeverageRepository:
+    """BeverageRepository class"""
 
-    def __init__(self):
-        """Constructor"""
-        self.__beverages = []
+    # def __init__(self):
+    #     """Constructor"""
+    #     self.__beverages = []
 
     def __str__(self):
         """String method"""
         return_string = ""
-        for beverage in self.__beverages:
+        for beverage in session.query(Beverage).all():
             return_string += f"{beverage}{os.linesep}"
         return return_string
+
+
+    
+    def create_database(self):
+        """Create the database tables based on the defined models"""
+        Base.metadata.create_all(engine)
+
+    def populate_database(self, beverages):
+        """Populate database from list of beverages"""
+        for beverage in beverages:
+            session.add(beverage)
+        session.commit()
     
 
     def add(self, id_, name, pack, price, active):
         """Add a new beverage to the collection"""
         new_beverage = Beverage(id_, name, pack, price, active)
         session.add(new_beverage)
-        session.commit()
 
     def find_by_id(self, id_):
         """Find a beverage by it's id"""

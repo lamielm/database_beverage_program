@@ -83,5 +83,4 @@ If I can not restore your packages easily, I will not grade the assignment.
 
 ## Known Problems, Issues, And/Or Errors in the Program
 
-In my program.py/beverage.py, I'm having issues with "circular import" of session.  I have to figure out the correct way to import that and the items related
-in order to make my program test-able.
+I'm looking for better explanation the "Read, Inser, Update, Delete" functionality portions.  Should I have a delete option?  Or an update option that asks user "Would you like to update an item?
