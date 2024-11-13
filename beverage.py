@@ -70,12 +70,12 @@ class BeverageRepository:
         session.commit()
     
 
-    def add(self, id_, name, pack, price, active):
+    def add(self, id_, name, pack, price, active): # Create
         """Add a new beverage to the collection"""
         new_beverage = Beverage(id_, name, pack, price, active)
         session.add(new_beverage)
 
-    def find_by_id(self, id_):
+    def find_by_id(self, id_): #Read?
         """Find a beverage by it's id"""
         single_beverage_id = (
             session.query(
@@ -87,5 +87,40 @@ class BeverageRepository:
             .first()
         )
         return single_beverage_id
+    
+    def update_existing(self, item_info, name, pack, price, active):
+        """Update an existing beverage"""
+        id_num = item_info
+        beverage_to_update = (
+                session.query(
+                    Beverage,
+                )
+                .filter(
+                    Beverage.id == id_num,
+                )
+                .first()
+            )
+        
+        beverage_to_update.name = name
+        beverage_to_update.pack = pack
+        beverage_to_update.price = price
+        
+        beverage_to_update.active = bool(active)
+    
+    def delete_existing(self, item_info):    
+        """Delete an existing beverage"""
+        id_num = int(item_info)           
+        beverage_to_delete = (
+            session.query(Beverage)
+            .filter(
+                Beverage.id == id_num,
+            )
+            .first()
+        )
+        session.delete(beverage_to_delete)
+
+    def commit_stuff(self):
+        """Method to commit session"""
+        session.commit()
             
     # I have to edit add(Should be good?), change find to filter(might be good?  Haven't tested it), update, and delete CRUD

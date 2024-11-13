@@ -32,7 +32,7 @@ def main(*args):
     choice = ui.display_menu_and_get_response()
 
     # While the choice is not exit program
-    while choice != 5:
+    while choice != 7:
         if choice == 1:
             # Create the database if it doens't already exist
             if not os.path.exists("./db.sqlite3"):
@@ -67,12 +67,15 @@ def main(*args):
 
         elif choice == 3:
             # Search for an Item
-            search_query = ui.get_search_query()
-            item_info = beverage_collection.find_by_id(search_query)
-            if item_info:
-                ui.display_item_found(item_info)
-            else:
-                ui.display_item_found_error()
+            item_found = False
+            while item_found != True: # Make an escape if you don't want to search for things anymore
+                search_query = ui.get_search_query()
+                item_info = beverage_collection.find_by_id(search_query)
+                if item_info: # Make it so that if DB is empty, it states that. Currently crashes program.
+                    ui.display_item_found(item_info)
+                    item_found = True
+                else:
+                    ui.display_item_found_error()
 
         elif choice == 4:
             # Collect information for a new item and add it to the collection
@@ -89,6 +92,35 @@ def main(*args):
                 ui.display_add_beverage_success()
             else:
                 ui.display_beverage_already_exists_error()
+
+        elif choice == 5:
+            # Update an existing beverage
+            search_query = ui.get_search_query()
+            item_info = beverage_collection.find_by_id(search_query)
+            if item_info:
+                ui.display_item_found(item_info)
+                updated_info = ui.update_existing_item_information()
+                beverage_collection.update_existing(
+                    search_query, 
+                    updated_info[0], 
+                    updated_info[1], 
+                    updated_info[2],
+                    updated_info[3],
+                    )
+                beverage_collection.commit_stuff()
+            else:
+                ui.display_item_found_error()
+
+        elif choice == 6:
+            # Delete an existing beverage
+            search_query = ui.get_search_query()
+            item_info = beverage_collection.find_by_id(search_query)
+            if item_info:
+                ui.display_item_found(item_info)
+                beverage_collection.delete_existing(item_info)
+                beverage_collection.commit_stuff()
+            else:
+                ui.display_item_found_error()
 
         # Get the new choice of what to do from the user.
         choice = ui.display_menu_and_get_response()

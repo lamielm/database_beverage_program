@@ -15,7 +15,7 @@ from colors import (
 class UserInterface:
     """UserInterface class"""
 
-    MAX_MENU_CHOICES = 5
+    MAX_MENU_CHOICES = 7
 
     # region public methods
 
@@ -60,6 +60,15 @@ class UserInterface:
             self.__get_str_field("Pack"),
             self.__get_decimal_field("Price"),
             self.__get_bool_field("Active"),
+        )
+    
+    def update_existing_item_information(self):
+        """Get new item information from the user."""
+        return (
+            self.__get_str_field("Name"),
+            self.__get_str_field("Pack"),
+            self.__get_decimal_field("Price"),
+            self.__set_bool_field("Active"),
         )
 
     def display_import_success(self):
@@ -143,7 +152,9 @@ class UserInterface:
         print("2. Print Entire List Of Items")
         print("3. Search For An Item (by ID)")
         print("4. Add New Item To The List")
-        print("5. Exit Program")
+        print("5. Update existing beverage")
+        print("6. Delete existing beverage")
+        print("7. Exit Program")
 
     def __display_main_prompt(self):
         """Display the Prompt"""
@@ -249,5 +260,27 @@ class UserInterface:
                 self.__display_prompt()
 
         return str(value)
+    
+    def __set_bool_field(self, fieldname):
+        """Get a valid Bool field from the console."""
+        print(f"Should the Item be {fieldname}? (y/n)")
+        self.__display_prompt()
+        valid = False
+        value = ""
+        while not valid:
+            user_input = input()
+            if user_input.lower() == "y" or user_input.lower() == "n":
+                valid = True
+                if user_input.lower() == "y":
+                    value = True
+                else:
+                    value = False
+            else:
+                print_error("That is not a valid Entry.")
+                print()
+                print(f"Should the Item be {fieldname}? (y/n)")
+                self.__display_prompt()
+
+        return value
 
     # endregion private methods
