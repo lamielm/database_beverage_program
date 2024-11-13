@@ -15,7 +15,7 @@ from colors import (
 class UserInterface:
     """UserInterface class"""
 
-    MAX_MENU_CHOICES = 7
+    MAX_MENU_CHOICES = 6
 
     # region public methods
 
@@ -48,7 +48,7 @@ class UserInterface:
     def get_search_query(self):
         """Get the search query from the user."""
         print()
-        print("What would you like to search for?")
+        print("What would you like to search for? (press x to return)")
         self.__display_prompt()
         return input()
 
@@ -148,13 +148,12 @@ class UserInterface:
         print()
         print("What would you like to do?")
         print()
-        print("1. Load Beverage List From CSV")
-        print("2. Print Entire List Of Items")
-        print("3. Search For An Item (by ID)")
-        print("4. Add New Item To The List")
-        print("5. Update existing beverage")
-        print("6. Delete existing beverage")
-        print("7. Exit Program")
+        print("1. Print Entire List Of Items")
+        print("2. Search For An Item (by ID)")
+        print("3. Add New Item To The List")
+        print("4. Update existing beverage")
+        print("5. Delete existing beverage")
+        print("6. Exit Program")
 
     def __display_main_prompt(self):
         """Display the Prompt"""

@@ -46,10 +46,6 @@ class Beverage(Base):
 class BeverageRepository:
     """BeverageRepository class"""
 
-    # def __init__(self):
-    #     """Constructor"""
-    #     self.__beverages = []
-
     def __str__(self):
         """String method"""
         return_string = ""
@@ -63,17 +59,25 @@ class BeverageRepository:
         """Create the database tables based on the defined models"""
         Base.metadata.create_all(engine)
 
-    def populate_database(self, beverages):
-        """Populate database from list of beverages"""
-        for beverage in beverages:
+    def bulk_add(self, beverages):
+        """Take in beverages list and commit it to DB"""
+        for id_, name, pack, price, active in beverages:
+            beverage = Beverage(
+                id_ = id_,
+                name = name,
+                pack = pack,
+                price = price,
+                active = active
+            )
+
             session.add(beverage)
         session.commit()
-    
 
     def add(self, id_, name, pack, price, active): # Create
         """Add a new beverage to the collection"""
         new_beverage = Beverage(id_, name, pack, price, active)
         session.add(new_beverage)
+        session.commit()
 
     def find_by_id(self, id_): #Read?
         """Find a beverage by it's id"""
@@ -87,16 +91,15 @@ class BeverageRepository:
             .first()
         )
         return single_beverage_id
-    
-    def update_existing(self, item_info, name, pack, price, active):
+        
+    def update_existing(self, id_, name, pack, price, active):
         """Update an existing beverage"""
-        id_num = item_info
         beverage_to_update = (
                 session.query(
                     Beverage,
                 )
                 .filter(
-                    Beverage.id == id_num,
+                    Beverage.id == id_,
                 )
                 .first()
             )
@@ -104,23 +107,18 @@ class BeverageRepository:
         beverage_to_update.name = name
         beverage_to_update.pack = pack
         beverage_to_update.price = price
-        
         beverage_to_update.active = bool(active)
+        session.commit()
     
-    def delete_existing(self, item_info):    
-        """Delete an existing beverage"""
-        id_num = int(item_info)           
+    def delete_existing(self, id_):    
+        """Delete an existing beverage"""         
         beverage_to_delete = (
             session.query(Beverage)
             .filter(
-                Beverage.id == id_num,
+                Beverage.id == id_,
             )
             .first()
         )
         session.delete(beverage_to_delete)
-
-    def commit_stuff(self):
-        """Method to commit session"""
         session.commit()
             
-    # I have to edit add(Should be good?), change find to filter(might be good?  Haven't tested it), update, and delete CRUD

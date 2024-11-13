@@ -11,12 +11,15 @@ class CSVProcessor:
         """Constructor"""
         self._has_been_imported = False
 
-    def import_csv(self, beverage_collection, path_to_csv_file, session):
+    def import_csv(self, beverage_collection, path_to_csv_file):
         """Import CSV and populate beverage collection"""
 
         # If already imported, raise AlreadyImportedError
         if self._has_been_imported:
             raise AlreadyImportedError
+        
+        # List to store each beverage
+        beverages = []
 
         # With open of file
         with open(path_to_csv_file, "r", encoding="utf-8") as file:
@@ -25,15 +28,17 @@ class CSVProcessor:
             # While the line is not None
             while line:
                 # Process the line.
-                self._process_line(line, beverage_collection)
+                beverage_data = self._process_line(line)
+                beverages.append(beverage_data)
                 # Read next line.
                 line = file.readline().replace("\n", "")
             # All lines read and processed, flip flag to true.
             self._has_been_imported = True
-        # Removed the session.commit from the "add" method as it was slowing down my program.  It committed after every object.
-        session.commit()
 
-    def _process_line(self, line, beverage_collection):
+            beverage_collection.bulk_add(beverages)
+        
+
+    def _process_line(self, line):
         """Process a line from a CSV file"""
 
         # Split line by comma
@@ -47,4 +52,4 @@ class CSVProcessor:
         active = parts[4] == "True"
 
         # Add a new beverage to the collection with the properties of what was read in.
-        beverage_collection.add(item_id, name, pack, price, active)
+        return (item_id, name, pack, price, active)
