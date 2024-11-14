@@ -2,6 +2,7 @@
 
 # System Imports.
 import os
+from utils import CSVProcessor
 
 # Third-Party imports
 from sqlalchemy import Column, create_engine
@@ -9,6 +10,11 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.types import (String, Float, Boolean)
 
+# Set a constant for the path to the CSV file
+PATH_TO_CSV = "./datafiles/beverage_list.csv"
+
+# Create an instance of the CSVProcessor class.
+csv_processor = CSVProcessor()
 
 engine = create_engine("sqlite:///db.sqlite3", echo=False)
 Session = sessionmaker(bind=engine)
@@ -121,4 +127,13 @@ class BeverageRepository:
         )
         session.delete(beverage_to_delete)
         session.commit()
-            
+
+    def has_beverages(self):
+        """Check if the database has beverages in the table"""
+        return session.query(Beverage).first() is not None
+    
+    def load_data(self):
+        """Imports the data from the CSV"""
+        beverage_collection = BeverageRepository()
+
+        csv_processor.import_csv(beverage_collection, PATH_TO_CSV)

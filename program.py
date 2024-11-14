@@ -1,10 +1,8 @@
 """Program code"""
 
 # Internal imports.
-from beverage import Beverage, BeverageRepository, session
-from errors import AlreadyImportedError
+from beverage import BeverageRepository
 from user_interface import UserInterface
-from utils import CSVProcessor
 import os
   
 
@@ -21,26 +19,16 @@ def main(*args):
     # Create an instance of the BeverageRepository class.
     beverage_collection = BeverageRepository()
 
-    # Create an instance of the CSVProcessor class.
-    csv_processor = CSVProcessor()
-
     # Create the database if it doens't already exist
     if not os.path.exists("./db.sqlite3"):
         # Create the database
         beverage_collection.create_database()
     
     # Check to see if there are any records in the DB.  If not, upload Beverages and put them into the DB.
-    if session.query(Beverage).first() is None:
-        # Load the CSV File
-        try:
-            csv_processor.import_csv(beverage_collection, PATH_TO_CSV)
-            ui.display_import_success()
-        except AlreadyImportedError:
-            ui.display_already_imported_error()
-        except FileNotFoundError:
-            ui.display_file_not_found_error()
-        except EOFError:
-            ui.display_empty_file_error()
+    if not beverage_collection.has_beverages():
+        # Load the CSV
+        beverage_collection.load_data()
+        
 
     # Display the Welcome Message to the user.
     ui.display_welcome_greeting()
@@ -48,8 +36,6 @@ def main(*args):
     # Display the Menu and get the response. Store the response in the choice
     # integer. This is the 'primer' run of displaying and getting.
     choice = ui.display_menu_and_get_response()
-
-    
 
     # While the choice is not exit program
     while choice != 6:
